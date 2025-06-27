@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NutriBoo</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <h1>🐾 NutriBoo</h1>
+  <p>Asisten Nutrisi Hewan Peliharaanmu</p>
+
+  <hr />
+  <h2>1. Prediksi Kebutuhan Kalori</h2>
+  <form id="calorieForm">
+    <label>Umur (tahun): <input type="number" name="age" required /></label><br />
+    <label>Berat (kg): <input type="number" name="weight" required /></label><br />
+    <label>Tinggi (cm): <input type="number" name="height" required /></label><br />
+    <button type="submit">Cek Kalori</button>
+  </form>
+  <div id="result-calorie"></div>
+
+  <hr />
+  <h2>2. Prediksi Makanan</h2>
+  <form id="predictForm" enctype="multipart/form-data">
+    <label>Upload Gambar Makanan: <input type="file" name="image" accept="image/*" required /></label><br />
+    <button type="submit">Prediksi</button>
+  </form>
+  <div id="result-predict"></div>
+
+  <hr />
+  <h2>3. Status Hewan</h2>
+  <form id="statusForm">
+    <label>Jam sejak makan terakhir: <input type="number" step="0.1" name="last_meal_hours" required /></label><br />
+    <label>Skor makanan sehat (0 - 1): <input type="number" step="0.1" name="healthy_food_score" required /></label><br />
+    <button type="submit">Cek Status</button>
+  </form>
+  <div id="result-status"></div>
+
+  <script src="/static/script.js"></script>
+</body>
+</html>
