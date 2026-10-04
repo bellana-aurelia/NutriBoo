@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NutriBoo</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-green-50 min-h-screen flex flex-col items-center">
+  
+  <!-- header -->
+  <header class="text-center py-6">
+    <img src="/Users/bellana/Downloads/NutriBoo Project/assets/logo.png" alt="NutriBoo Logo" class="mx-auto w-24 mb-3">
+    <h1 class="text-4xl font-bold text-green-700 flex justify-center items-center">
+      <span class="mr-2">🐾</span> NutriBoo
+    </h1>
+    <p class="text-gray-600 italic">Asisten Nutrisi Hewan Peliharaanmu</p>
+  </header>
+
+  <!-- form kalori -->
+  <section class="bg-white rounded-xl shadow-md w-full max-w-4xl p-8 mb-8">
+    <h2 class="text-green-700 text-xl font-semibold mb-4">Prediksi Kebutuhan Kalori</h2>
+    <form id="calorie-form" class="space-y-4">
+      <div>
+        <label for="age" class="block mb-1">Usia:</label>
+        <input type="number" id="age" name="age" class="w-full border border-gray-300 rounded p-2">
+      </div>
+      <div>
+        <label for="weight" class="block mb-1">Berat (kg):</label>
+        <input type="number" id="weight" name="weight" class="w-full border border-gray-300 rounded p-2">
+      </div>
+      <div>
+        <label for="height" class="block mb-1">Tinggi (cm):</label>
+        <input type="number" id="height" name="height" class="w-full border border-gray-300 rounded p-2">
+      </div>
+      <button type="submit" class="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700">Hitung Kalori</button>
+      <p id="calorie-result" class="text-gray-700"></p>
+    </form>
+  </section>
+
+  <!-- form gambar -->
+  <section class="bg-white rounded-xl shadow-md w-full max-w-4xl p-8 mb-8">
+    <h2 class="text-green-700 text-xl font-semibold mb-4">Prediksi Makanan dari Gambar</h2>
+    <form id="food-form" enctype="multipart/form-data" class="space-y-4">
+      <div>
+        <label for="food-image" class="block mb-1">Upload Gambar:</label>
+        <input type="file" id="food-image" name="image" accept="image/*" class="w-full border border-gray-300 rounded p-2 bg-white">
+      </div>
+      <button type="submit" class="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700">Klasifikasi Makanan</button>
+      <p id="food-result" class="text-gray-700"></p>
+    </form>
+  </section>
+
+  <!-- form status hewan -->
+  <section class="bg-white rounded-xl shadow-md w-full max-w-4xl p-8 mb-8">
+    <h2 class="text-green-700 text-xl font-semibold mb-4">Status Hewan Peliharaan</h2>
+    <form id="pet-form" class="space-y-4">
+      <div>
+        <label for="last-meal" class="block mb-1">Jam sejak makan terakhir:</label>
+        <input type="number" step="any" id="last-meal" name="last_meal" class="w-full border border-gray-300 rounded p-2">
+      </div>
+      <div>
+        <label for="healthy-score" class="block mb-1">Skor Makanan Sehat (0-1):</label>
+        <input type="number" step="any" id="healthy-score" name="healthy_score" class="w-full border border-gray-300 rounded p-2">
+      </div>
+      <button type="submit" class="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700">Cek Status</button>
+      <p id="pet-result" class="text-gray-700"></p>
+    </form>
+  </section>
+
+
+  <section class="bg-white rounded-xl shadow-md w-full max-w-4xl p-8 mb-20">
+    <h2 class="text-green-700 text-xl font-semibold mb-4">Ringkasan</h2>
+    <p id="summary-result" class="text-gray-700">...</p>
+    <div class="mt-6">
+      <canvas id="nutritionChart" class="w-full h-64"></canvas>
+    </div>
+  </section>
+
+ 
+  <img src="/Users/bellana/Downloads/NutriBoo Project/assets/hamster.png" alt="Hamster" class="fixed bottom-4 right-4 w-16">
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <script src="/static/script.js"></script>
+</body>
+
+</html>
