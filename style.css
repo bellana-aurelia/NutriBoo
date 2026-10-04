@@ -1,4 +1,4 @@
-body {
+.body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background-color: #f5fff9;
   color: #333;
@@ -9,29 +9,29 @@ body {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-h1 {
+.h1 {
   color: #2c9c76;
   text-align: center;
 }
 
-hr {
+.hr {
   border: none;
   height: 1px;
   background-color: #ddd;
   margin: 30px 0;
 }
 
-form {
+.form {
   margin-bottom: 20px;
 }
 
-label {
+.label {
   display: block;
   margin-top: 10px;
   font-weight: 600;
 }
 
-input, select, button {
+.input, select, button {
   width: 100%;
   padding: 8px 12px;
   margin-top: 5px;
@@ -41,7 +41,7 @@ input, select, button {
   font-size: 16px;
 }
 
-button {
+.button {
   background-color: #2c9c76;
   color: white;
   font-weight: bold;
