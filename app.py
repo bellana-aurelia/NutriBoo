@@ -12,7 +12,6 @@ import os
 import uuid
 import logging
 
-# Inisialisasi logger
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -22,7 +21,6 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# ===== CORS setup =====
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # Ganti "*" ke asal domain frontend yang sah jika sudah production
@@ -31,16 +29,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ===== Tambahan: Static dan Templates =====
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
-# ===== Load model sekali saat startup =====
 logger.info("Loading MobileNetV2 model...")
 model_cnn = MobileNetV2(weights='imagenet')
 logger.info("Model loaded.")
 
-# ===== Data Models =====
 class CalorieNeedsRequest(BaseModel):
     age: int
     weight: float
@@ -50,7 +45,6 @@ class PetStatusRequest(BaseModel):
     last_meal_hours: float
     healthy_food_score: float
 
-# ===== Utility Functions =====
 def classify_food(image_path: str):
     img = image.load_img(image_path, target_size=(224, 224))
     x = image.img_to_array(img)
@@ -63,8 +57,7 @@ def is_unhealthy(food_label: str):
     unhealthy_keywords = ['french fries', 'cake', 'burger', 'donut', 'soda']
     return any(keyword in food_label.lower() for keyword in unhealthy_keywords)
 
-# ===== Routes =====
-
+# routes
 @app.get("/", response_class=HTMLResponse)
 async def index(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
