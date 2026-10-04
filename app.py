@@ -6,36 +6,40 @@ from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 import numpy as np
 from tensorflow.keras.applications.mobilenet_v2 import MobileNetV2, preprocess_input, decode_predictions
-from tensorflow.keras.preprocessing import image
+from tensorflow.keras.preprocessing import image as keras_image
 import shutil
 import os
 import uuid
 import logging
+import pathlib
 
+# Logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-app = FastAPI(
-    title="Food Classification & Health API",
-    description="API untuk klasifikasi makanan dan perhitungan kebutuhan kalori serta status hewan peliharaan.",
-    version="1.0.0"
-)
+# App init
+app = FastAPI()
 
+# CORS setup
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Ganti "*" ke asal domain frontend yang sah jika sudah production
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+# Folder setup
+pathlib.Path("static").mkdir(parents=True, exist_ok=True)
+pathlib.Path("templates").mkdir(parents=True, exist_ok=True)
+
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
-logger.info("Loading MobileNetV2 model...")
-model_cnn = MobileNetV2(weights='imagenet')
-logger.info("Model loaded.")
+# Load CNN model
+model_cnn = MobileNetV2(weights="imagenet")
 
+# Pydantic models
 class CalorieNeedsRequest(BaseModel):
     age: int
     weight: float
@@ -45,19 +49,6 @@ class PetStatusRequest(BaseModel):
     last_meal_hours: float
     healthy_food_score: float
 
-def classify_food(image_path: str):
-    img = image.load_img(image_path, target_size=(224, 224))
-    x = image.img_to_array(img)
-    x = preprocess_input(np.expand_dims(x, axis=0))
-    preds = model_cnn.predict(x)
-    decoded = decode_predictions(preds, top=1)[0][0]  # (class_id, class_name, score)
-    return decoded[1], float(decoded[2])  # (label, confidence)
-
-def is_unhealthy(food_label: str):
-    unhealthy_keywords = ['french fries', 'cake', 'burger', 'donut', 'soda']
-    return any(keyword in food_label.lower() for keyword in unhealthy_keywords)
-
-# routes
 @app.get("/", response_class=HTMLResponse)
 async def index(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
@@ -71,19 +62,30 @@ async def predict_food(image: UploadFile = File(...)):
         shutil.copyfileobj(image.file, buffer)
 
     try:
-        label, confidence = classify_food(temp_path)
-        unhealthy = is_unhealthy(label)
+        logger.info(f"Image saved to {temp_path}")
+        img = keras_image.load_img(temp_path, target_size=(224, 224))
+        x = keras_image.img_to_array(img)
+        x = preprocess_input(np.expand_dims(x, axis=0))
+        preds = model_cnn.predict(x)
+        logger.info(f"Prediction done: {preds}")
+
+        label, confidence = decode_predictions(preds, top=1)[0][0][1:]
+        unhealthy = any(k in label.lower() for k in ['french fries', 'cake', 'burger', 'donut', 'soda'])
+
         return {
             "nama_makanan": label,
-            "confidence": confidence,
+            "confidence": float(confidence),
             "status_sehat": not unhealthy
         }
+
     except Exception as e:
-        logger.error(f"Error during food classification: {e}")
+        logger.exception("Error processing image")
         raise HTTPException(status_code=500, detail="Error processing image")
+
     finally:
         if os.path.exists(temp_path):
             os.remove(temp_path)
+
 
 @app.post("/calorie_needs")
 async def calorie_needs(data: CalorieNeedsRequest):
@@ -91,8 +93,8 @@ async def calorie_needs(data: CalorieNeedsRequest):
         bmr = 10 * data.weight + 6.25 * data.height - 5 * data.age + 5
         return {"calorie_needs": round(bmr, 2)}
     except Exception as e:
-        logger.error(f"Error during calorie needs calculation: {e}")
-        raise HTTPException(status_code=500, detail="Error calculating calorie needs")
+        logger.error(f"Error calculating calorie needs: {e}")
+        raise HTTPException(status_code=500, detail="Gagal menghitung kalori.")
 
 @app.post("/pet_status")
 async def pet_status(data: PetStatusRequest):
@@ -104,13 +106,5 @@ async def pet_status(data: PetStatusRequest):
             "status": status
         }
     except Exception as e:
-        logger.error(f"Error during pet status check: {e}")
-        raise HTTPException(status_code=500, detail="Error processing pet status")
-
-@app.exception_handler(Exception)
-async def global_exception_handler(request: Request, exc: Exception):
-    logger.error(f"Unexpected error: {exc}")
-    return JSONResponse(
-        status_code=500,
-        content={"message": "Internal Server Error"},
-    )
+        logger.error(f"Error evaluating pet status: {e}")
+        raise HTTPException(status_code=500, detail="Gagal memproses status hewan.")
